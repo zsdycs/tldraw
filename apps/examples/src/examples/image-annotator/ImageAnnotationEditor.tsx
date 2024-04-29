@@ -3,7 +3,6 @@ import {
 	AssetRecordType,
 	Box,
 	Editor,
-	PORTRAIT_BREAKPOINT,
 	SVGContainer,
 	TLImageShape,
 	TLShapeId,
@@ -17,6 +16,7 @@ import {
 	useBreakpoint,
 	useEditor,
 } from 'tldraw'
+import { PORTRAIT_BREAKPOINT } from 'tldraw/src/lib/ui/constants'
 import { AnnotatorImage } from './types'
 
 // TODO:

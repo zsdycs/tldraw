@@ -37,6 +37,7 @@
 		"@radix-ui/react-alert-dialog": "^1.0.5",
 		"@tldraw/assets": "workspace:*",
 		"@vercel/analytics": "^1.1.1",
+		"browser-fs-access": "^0.35.0",
 		"classnames": "^2.3.2",
 		"lazyrepo": "0.0.0-alpha.27",
 		"lodash": "^4.17.21",
