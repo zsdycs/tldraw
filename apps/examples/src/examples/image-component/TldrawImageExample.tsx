@@ -72,7 +72,7 @@ export default function TldrawImageExample() {
 						onMount={(editor: Editor) => {
 							setEditor(editor)
 							editor.updateInstanceState({ isDebugMode: false })
-							editor.user.updateUserPreferences({ isDarkMode })
+							editor.user.updateUserPreferences({ colorScheme: isDarkMode ? 'dark' : 'light' })
 							if (currentPageId) {
 								editor.setCurrentPage(currentPageId)
 							}
