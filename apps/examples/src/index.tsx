@@ -31,6 +31,10 @@ const router = createBrowserRouter([
 	},
 	{
 		path: '/',
+		lazy: async () => ({ element: <Develop /> }),
+	},
+	{
+		path: 'ex',
 		lazy: async () => {
 			const Component = await basicExample.loadComponent()
 			return {
@@ -41,10 +45,6 @@ const router = createBrowserRouter([
 				),
 			}
 		},
-	},
-	{
-		path: 'develop',
-		lazy: async () => ({ element: <Develop /> }),
 	},
 	{
 		path: 'end-to-end',
