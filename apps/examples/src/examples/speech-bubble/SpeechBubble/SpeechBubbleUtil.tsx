@@ -8,7 +8,7 @@ import {
 	Geometry2d,
 	LABEL_FONT_SIZES,
 	Polygon2d,
-	ShapePropsType,
+	RecordPropsType,
 	ShapeUtil,
 	T,
 	TEXT_PROPS,
@@ -22,9 +22,9 @@ import {
 	ZERO_INDEX_KEY,
 	resizeBox,
 	structuredClone,
+	useDefaultColorTheme,
 	vecModelValidator,
 } from 'tldraw'
-import { useDefaultColorTheme } from 'tldraw/src/lib/shapes/shared/ShapeFill'
 import { getSpeechBubbleVertices, getTailIntersectionPoint } from './helpers'
 
 // Copied from tldraw/tldraw
@@ -52,7 +52,7 @@ export const speechBubbleShapeProps = {
 	tail: vecModelValidator,
 }
 
-export type SpeechBubbleShapeProps = ShapePropsType<typeof speechBubbleShapeProps>
+export type SpeechBubbleShapeProps = RecordPropsType<typeof speechBubbleShapeProps>
 export type SpeechBubbleShape = TLBaseShape<'speech-bubble', SpeechBubbleShapeProps>
 
 export class SpeechBubbleUtil extends ShapeUtil<SpeechBubbleShape> {

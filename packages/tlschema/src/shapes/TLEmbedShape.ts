@@ -1,10 +1,7 @@
 import { T } from '@tldraw/validate'
-import {
-	RETIRED_DOWN_MIGRATION,
-	createShapePropsMigrationIds,
-	createShapePropsMigrationSequence,
-} from '../records/TLShape'
-import { ShapePropsType, TLBaseShape } from './TLBaseShape'
+import { createShapePropsMigrationIds, createShapePropsMigrationSequence } from '../records/TLShape'
+import { RETIRED_DOWN_MIGRATION, RecordPropsType } from '../recordsWithProps'
+import { TLBaseShape } from './TLBaseShape'
 
 // Only allow multiplayer embeds. If we add additional routes later for example '/help' this won't match
 const TLDRAW_APP_RE = /(^\/r\/[^/]+\/?$)/
@@ -83,6 +80,9 @@ export const EMBED_DEFINITIONS = [
 		width: 720,
 		height: 500,
 		doesResize: true,
+		overridePermissions: {
+			'allow-presentation': true,
+		},
 		toEmbedUrl: (url) => {
 			if (url.includes('/maps/')) {
 				const match = url.match(/@(.*),(.*),(.*)z/)
@@ -123,8 +123,8 @@ export const EMBED_DEFINITIONS = [
 		doesResize: true,
 		toEmbedUrl: (url) => {
 			const urlObj = safeParseUrl(url)
-			// e.g. extract "steveruizok.mathFact" from https://www.val.town/v/steveruizok.mathFact
-			const matches = urlObj && urlObj.pathname.match(/\/v\/([^/]+)\/?/)
+			// e.g. extract "steveruizok/mathFact" from https://www.val.town/v/steveruizok/mathFact
+			const matches = urlObj && urlObj.pathname.match(/\/v\/(.+)\/?/)
 			if (matches) {
 				return `https://www.val.town/embed/${matches[1]}`
 			}
@@ -132,8 +132,8 @@ export const EMBED_DEFINITIONS = [
 		},
 		fromEmbedUrl: (url) => {
 			const urlObj = safeParseUrl(url)
-			// e.g. extract "steveruizok.mathFact" from https://www.val.town/v/steveruizok.mathFact
-			const matches = urlObj && urlObj.pathname.match(/\/embed\/([^/]+)\/?/)
+			// e.g. extract "steveruizok/mathFact" from https://www.val.town/v/steveruizok/mathFact
+			const matches = urlObj && urlObj.pathname.match(/\/embed\/(.+)\/?/)
 			if (matches) {
 				return `https://www.val.town/v/${matches[1]}`
 			}
@@ -229,6 +229,7 @@ export const EMBED_DEFINITIONS = [
 		doesResize: true,
 		overridePermissions: {
 			'allow-presentation': true,
+			'allow-popups-to-escape-sandbox': true,
 		},
 		isAspectRatioLocked: true,
 		toEmbedUrl: (url) => {
@@ -272,6 +273,9 @@ export const EMBED_DEFINITIONS = [
 		minHeight: 360,
 		doesResize: true,
 		instructionLink: 'https://support.google.com/calendar/answer/41207?hl=en',
+		overridePermissions: {
+			'allow-popups-to-escape-sandbox': true,
+		},
 		toEmbedUrl: (url) => {
 			const urlObj = safeParseUrl(url)
 			const cidQs = urlObj?.searchParams.get('cid')
@@ -313,6 +317,9 @@ export const EMBED_DEFINITIONS = [
 		minWidth: 460,
 		minHeight: 360,
 		doesResize: true,
+		overridePermissions: {
+			'allow-popups-to-escape-sandbox': true,
+		},
 		toEmbedUrl: (url) => {
 			const urlObj = safeParseUrl(url)
 
@@ -571,37 +578,37 @@ export const embedShapePermissionDefaults = {
 	// Disabled permissions
 	// ========================================================================================
 	// [MDN] Experimental: Allows for downloads to occur without a gesture from the user.
-	// [REASON] Disabled because otherwise the <iframe/> trick the user on behalf of us to performing an action
+	// [REASON] Disabled because otherwise the <iframe/> can trick the user on behalf of us to perform an action.
 	'allow-downloads-without-user-activation': false,
 	// [MDN] Allows for downloads to occur with a gesture from the user.
-	// [REASON] Disabled because otherwise the <iframe/> trick the user on behalf of us to performing an action
+	// [REASON] Disabled because otherwise the <iframe/> can trick the user on behalf of us to perform an action.
 	'allow-downloads': false,
 	// [MDN] Lets the resource open modal windows.
-	// [REASON] The <iframe/> could 'window.prompt("Enter your tldraw password")'
+	// [REASON] The <iframe/> could 'window.prompt("Enter your tldraw password")'.
 	'allow-modals': false,
 	// [MDN] Lets the resource lock the screen orientation.
-	// [REASON] Would interfer with tldraw interface
+	// [REASON] Would interfere with the tldraw interface.
 	'allow-orientation-lock': false,
 	// [MDN] Lets the resource use the Pointer Lock API.
-	// [REASON] Maybe we should allow this for games embeds (scratch/codepen/codesandbox)
+	// [REASON] Maybe we should allow this for games embeds (scratch/codepen/codesandbox).
 	'allow-pointer-lock': false,
 	// [MDN] Allows popups (such as window.open(), target="_blank", or showModalDialog()). If this keyword is not used, the popup will silently fail to open.
-	// [REASON] We shouldn't allow popups as a embed could pretend to be us by opening a mocked version of tldraw. This is very unobvious when it is performed as an action within out app
+	// [REASON] We want to allow embeds to link back to their original sites (e.g. YouTube).
 	'allow-popups': true,
 	// [MDN] Lets the sandboxed document open new windows without those windows inheriting the sandboxing. For example, this can safely sandbox an advertisement without forcing the same restrictions upon the page the ad links to.
-	// [REASON] We're alread disabling popups.
+	// [REASON] We shouldn't allow popups as a embed could pretend to be us by opening a mocked version of tldraw. This is very unobvious when it is performed as an action within our app.
 	'allow-popups-to-escape-sandbox': false,
 	// [MDN] Lets the resource start a presentation session.
-	// [REASON] Prevents embed from navigating away from tldraw and pretending to be us
+	// [REASON] Prevents embed from navigating away from tldraw and pretending to be us.
 	'allow-presentation': false,
 	// [MDN] Experimental: Lets the resource request access to the parent's storage capabilities with the Storage Access API.
-	// [REASON] We don't want anyone else to access our storage
+	// [REASON] We don't want anyone else to access our storage.
 	'allow-storage-access-by-user-activation': false,
 	// [MDN] Lets the resource navigate the top-level browsing context (the one named _top).
-	// [REASON] Prevents embed from navigating away from tldraw and pretending to be us
+	// [REASON] Prevents embed from navigating away from tldraw and pretending to be us.
 	'allow-top-navigation': false,
 	// [MDN] Lets the resource navigate the top-level browsing context, but only if initiated by a user gesture.
-	// [REASON] Prevents embed from navigating away from tldraw and pretending to be us
+	// [REASON] Prevents embed from navigating away from tldraw and pretending to be us.
 	'allow-top-navigation-by-user-activation': false,
 	// ========================================================================================
 	// Enabled permissions
@@ -625,7 +632,7 @@ export const embedShapeProps = {
 }
 
 /** @public */
-export type TLEmbedShapeProps = ShapePropsType<typeof embedShapeProps>
+export type TLEmbedShapeProps = RecordPropsType<typeof embedShapeProps>
 
 /** @public */
 export type TLEmbedShape = TLBaseShape<'embed', TLEmbedShapeProps>

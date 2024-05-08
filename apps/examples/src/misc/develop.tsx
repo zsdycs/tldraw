@@ -1,43 +1,18 @@
+import { Tldraw } from 'tldraw'
 import 'tldraw/tldraw.css'
-import { useFileSystem } from './file/useFileSystem'
-import {
-	Tldraw,
-	DefaultMainMenu,
-	EditSubmenu,
-	ExportFileContentSubMenu,
-	ExtrasGroup,
-	PreferencesGroup,
-	TLComponents,
-	ViewSubmenu,
-} from 'tldraw'
-
-import { LocalFileMenu } from './file/FileMenu'
-
-const components: TLComponents = {
-	MainMenu: () => (
-		<DefaultMainMenu>
-			<LocalFileMenu />
-			<EditSubmenu />
-			<ViewSubmenu />
-			<ExportFileContentSubMenu />
-			<ExtrasGroup />
-			<PreferencesGroup />
-		</DefaultMainMenu>
-	),
-}
+import { usePerformance } from '../hooks/usePerformance'
 
 export default function Develop() {
-	const fileSystemUiOverrides = useFileSystem({ isMultiplayer: false })
+	const performanceOverrides = usePerformance()
 	return (
 		<div className="tldraw__editor">
 			<Tldraw
+				overrides={[performanceOverrides]}
 				persistenceKey="tldraw_example"
 				onMount={(editor) => {
 					;(window as any).app = editor
 					;(window as any).editor = editor
 				}}
-				overrides={[fileSystemUiOverrides]}
-				components={components}
 			/>
 		</div>
 	)
